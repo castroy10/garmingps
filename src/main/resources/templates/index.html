@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Создание Gps Трека</title>
+    <!--Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://getbootstrap.com/docs/5.3/assets/css/docs.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+            crossorigin="anonymous"></script>
+</head>
+<body>
+
+<div class="container mt-4">
+    <h2>Создание GPS Трека</h2>
+    <form id="trackForm">
+        <!-- Ряд 1 -->
+        <div class="row mb-3">
+            <div class="col-md-5">
+                <label for="lat1" class="form-label">Широта 1</label>
+                <input type="text" class="form-control" id="lat1" name="lat1" placeholder="Широта 1">
+            </div>
+            <div class="col-md-5">
+                <label for="lon1" class="form-label">Долгота 1</label>
+                <input type="text" class="form-control" id="lon1" name="lon1" placeholder="Долгота 1">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="button" class="btn btn-primary w-100" onclick="addCoordinate(1)">Добавить</button>
+            </div>
+        </div>
+
+        <!-- Ряд 2 -->
+        <div class="row mb-3">
+            <div class="col-md-5">
+                <label for="lat2" class="form-label">Широта 2</label>
+                <input type="text" class="form-control" id="lat2" name="lat2" placeholder="Широта 2">
+            </div>
+            <div class="col-md-5">
+                <label for="lon2" class="form-label">Долгота 2</label>
+                <input type="text" class="form-control" id="lon2" name="lon2" placeholder="Долгота 2">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="button" class="btn btn-primary w-100" onclick="addCoordinate(2)">Добавить</button>
+            </div>
+        </div>
+
+        <!-- Ряд 3 -->
+        <div class="row mb-3">
+            <div class="col-md-5">
+                <label for="lat3" class="form-label">Широта 3</label>
+                <input type="text" class="form-control" id="lat3" name="lat3" placeholder="Широта 3">
+            </div>
+            <div class="col-md-5">
+                <label for="lon3" class="form-label">Долгота 3</label>
+                <input type="text" class="form-control" id="lon3" name="lon3" placeholder="Долгота 3">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="button" class="btn btn-primary w-100" onclick="addCoordinate(3)">Добавить</button>
+            </div>
+        </div>
+
+        <!-- Ряд 4 -->
+        <div class="row mb-3">
+            <div class="col-md-5">
+                <label for="lat4" class="form-label">Широта 4</label>
+                <input type="text" class="form-control" id="lat4" name="lat4" placeholder="Широта 4">
+            </div>
+            <div class="col-md-5">
+                <label for="lon4" class="form-label">Долгота 4</label>
+                <input type="text" class="form-control" id="lon4" name="lon4" placeholder="Долгота 4">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="button" class="btn btn-primary w-100" onclick="addCoordinate(4)">Добавить</button>
+            </div>
+        </div>
+
+        <button type="button" class="btn btn-success" onclick="submitCoordinates()">Отправить</button>
+    </form>
+
+    <div id="output" class="mt-3"></div>
+</div>
+
+<script>
+    // Массив для хранения объектов Coordinate (в виде {lat: "...", lon: "..."})
+    let coordinates = [];
+
+    // Функция для добавления координаты из полей ввода в массив
+    function addCoordinate(index) {
+        const latInput = document.getElementById(`lat${index}`);
+        const lonInput = document.getElementById(`lon${index}`);
+        const latValue = latInput.value.trim();
+        const lonValue = lonInput.value.trim();
+
+        if (latValue && lonValue) {
+            // Добавляем объект с lat и lon (в виде строк)
+            coordinates.push({ lat: latValue, lon: lonValue });
+            console.log("Добавлена координата:", { lat: latValue, lon: lonValue });
+            // Очищаем поля ввода после добавления
+            latInput.value = '';
+            lonInput.value = '';
+        } else {
+            alert(`Пожалуйста, заполните оба поля для ряда ${index}.`);
+        }
+    }
+
+    // Функция для отправки координат на сервер
+    function submitCoordinates() {
+        if (coordinates.length < 4) {
+            alert("Пожалуйста, добавьте не менее 4 координат.");
+            return;
+        }
+
+        // Выбираем первые 4 координаты
+        const coordinatesToSend = coordinates.slice(0, 4);
+
+        // Отправляем POST-запрос с JSON-телом
+        fetch('/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json' // Указываем, что отправляем JSON
+            },
+            // Сериализуем массив объектов Coordinate в JSON-строку
+            body: JSON.stringify(coordinatesToSend)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    // Получаем текст ошибки, если запрос неуспешен (например, 500)
+                    // Это поможет увидеть сообщение об ошибке от сервера, если он вернул HTML
+                    return response.text().then(text => {
+                        // Выводим HTML ошибки в консоль для отладки
+                        console.error("Ответ сервера с ошибкой (HTML):", text);
+                        // Выбрасываем новую ошибку с информацией о статусе
+                        throw new Error(`Сервер вернул ошибку: ${response.status} ${response.statusText}`);
+                    });
+                }
+                // Если запрос успешен, ожидаем бинарные данные (blob)
+                // Это соответствует возвращаемому типу byte[] из контроллера Spring
+                return response.blob();
+            })
+            .then(blob => {
+                // Создаем URL для blob-объекта
+                const downloadUrl = window.URL.createObjectURL(blob);
+
+                // Создаем временный элемент <a> для скачивания
+                const link = document.createElement('a');
+                link.href = downloadUrl;
+                // Указываем имя файла, которое будет предложено для скачивания
+                link.download = 'track.gpx'; // или динамически сгенерировать имя, если нужно
+
+                // Добавляем ссылку в DOM, симулируем клик и удаляем её
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                // Освобождаем созданный URL, чтобы освободить память
+                window.URL.revokeObjectURL(downloadUrl);
+
+                console.log('Файл успешно получен и предложен для скачивания.');
+                document.getElementById('output').innerHTML = '<div class="alert alert-success">Файл успешно создан и предложен для скачивания!</div>';
+                // Очищаем массив координат после успешной отправки и получения файла
+                coordinates = [];
+            })
+            .catch(error => {
+                // Обработка любых ошибок (сетевых, JSON.parse, логики внутри .then и т.д.)
+                console.error('Ошибка при отправке или обработке ответа:', error);
+                // Отображаем сообщение об ошибке пользователю
+                document.getElementById('output').innerHTML = '<div class="alert alert-danger">Ошибка: ' + error.message + '</div>';
+            });
+    }
+</script>
+
+</body>
+</html>

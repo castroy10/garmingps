@@ -19,10 +19,10 @@ import lombok.Setter;
 public class RoutePoint {
 
     @XmlAttribute(name = "lat", required = true)
-    protected double lat;
+    protected String lat;
 
     @XmlAttribute(name = "lon", required = true)
-    protected double lon;
+    protected String lon;
 
     @XmlElement(name = "name", namespace = "http://www.topografix.com/GPX/1/1")
     protected String name;

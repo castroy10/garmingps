@@ -18,9 +18,9 @@ import lombok.Setter;
 public class TrackPoint {
 
     @XmlAttribute(name = "lat", required = true)
-    protected double lat;
+    protected String lat;
 
     @XmlAttribute(name = "lon", required = true)
-    protected double lon;
+    protected String lon;
 
 }
