@@ -1,0 +1,11 @@
+services:
+
+  report:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: garmingps
+    restart: unless-stopped
+    ports:
+      - "8060:8080"
+      - "1097:1097"

@@ -103,10 +103,6 @@
                 }
             }
         });
-        if (coordinates.length < 4) {
-            alert(`Пожалуйста, добавьте не менее 4 координат. Сейчас: ${coordinates.length}.`);
-            return;
-        }
         // Отправляем все собранные координаты
         const coordinatesToSend = coordinates;
         // Отправляем POST-запрос с JSON-телом
