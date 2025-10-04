@@ -7,5 +7,5 @@ services:
     container_name: garmingps
     restart: unless-stopped
     ports:
-      - "8060:8080"
+      - "127.0.0.1:8060:8060"
       - "1097:1097"

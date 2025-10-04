@@ -25,8 +25,8 @@ public class MainController {
     @PostMapping("/create")
     public ResponseEntity<byte[]> create(@RequestBody final List<Coordinate> coordinate) {
         return ResponseEntity.ok()
-                             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"output.xlsx\"")
-                             .header(HttpHeaders.CONTENT_TYPE, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"track.gpx\"")
+                             .header(HttpHeaders.CONTENT_TYPE, "application/octet-stream")
                              .body(gpsCreatorService.getGpsTrack(coordinate));
     }
 }

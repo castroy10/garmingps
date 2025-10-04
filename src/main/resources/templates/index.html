@@ -16,9 +16,7 @@
 <div class="container mt-4">
     <h2>Создание GPS Трека</h2>
     <form id="trackForm">
-        <div id="coordinatesContainer">
-        </div>
-
+        <div id="coordinatesContainer"></div>
         <button type="button" class="btn btn-success mt-3" onclick="submitCoordinates()">Отправить</button>
     </form>
 
@@ -26,10 +24,9 @@
 </div>
 
 <script>
-    // Массив для хранения объектов Coordinate (в виде {lat: "...", lon: "..."})
     let coordinates = [];
-    // Счетчик для генерации уникальных ID
     let rowIndex = 0;
+
     // Функция для добавления новой строки
     function addRow(latValue = '', lonValue = '') {
         rowIndex++;
@@ -41,11 +38,11 @@
         rowDiv.innerHTML = `
             <div class="col-md-5">
                 <label for="lat${rowIndex}" class="form-label">Широта ${rowIndex}</label>
-                <input type="text" class="form-control" id="lat${rowIndex}" name="lat${rowIndex}" placeholder="Широта ${rowIndex}" value="${latValue}">
+                <input type="text" class="form-control" id="lat${rowIndex}" name="lat${rowIndex}" placeholder="Широта ${rowIndex}" value="${latValue}" title="в формате 60.148500">
             </div>
             <div class="col-md-5">
                 <label for="lon${rowIndex}" class="form-label">Долгота ${rowIndex}</label>
-                <input type="text" class="form-control" id="lon${rowIndex}" name="lon${rowIndex}" placeholder="Долгота ${rowIndex}" value="${lonValue}">
+                <input type="text" class="form-control" id="lon${rowIndex}" name="lon${rowIndex}" placeholder="Долгота ${rowIndex}" value="${lonValue}" title="в формате 30.586183">
             </div>
             <div class="col-md-2 d-flex align-items-end">
                 <button type="button" class="btn btn-primary w-100" onclick="addCoordinate(${rowIndex})">Добавить</button>
@@ -65,9 +62,6 @@
             // Добавляем объект с lat и lon (в виде строк)
             coordinates.push({lat: latValue, lon: lonValue});
             console.log("Добавлена координата:", {lat: latValue, lon: lonValue});
-            // Очищаем поля ввода после добавления
-            // latInput.value = ''; // <-- УБРАНО: значение остается
-            // lonInput.value = ''; // <-- УБРАНО: значение остается
             // Создаем новую строку с пустыми значениями
             addRow(); // Добавляем новую пустую строку
         } else {
@@ -135,8 +129,7 @@
                 // Создаем временный элемент <a> для скачивания
                 const link = document.createElement('a');
                 link.href = downloadUrl;
-                // Указываем имя файла, которое будет предложено для скачивания
-                link.download = 'track.gpx'; // или динамически сгенерировать имя, если нужно
+                link.download = 'track.gpx';
                 // Добавляем ссылку в DOM, симулируем клик и удаляем её
                 document.body.appendChild(link);
                 link.click();
@@ -144,7 +137,7 @@
                 // Освобождаем созданный URL, чтобы освободить память
                 window.URL.revokeObjectURL(downloadUrl);
                 console.log('Файл успешно получен и предложен для скачивания.');
-                document.getElementById('output').innerHTML = '<div class="alert alert-success">Файл успешно создан и предложен для скачивания!</div>';
+                document.getElementById('output').innerHTML = '<div class="alert alert-success">Файл успешно создан</div>';
                 // Очищаем массив координат после успешной отправки и получения файла
                 coordinates = [];
                 // Очищаем контейнер с полями ввода
@@ -161,6 +154,7 @@
                 document.getElementById('output').innerHTML = '<div class="alert alert-danger">Ошибка: ' + error.message + '</div>';
             });
     }
+
     // Добавляем первую строку при загрузке страницы
     document.addEventListener('DOMContentLoaded', function () {
         addRow();
