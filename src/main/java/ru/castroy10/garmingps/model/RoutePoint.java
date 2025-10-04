@@ -31,6 +31,6 @@ public class RoutePoint {
     protected String sym;
 
     @XmlElement(name = "type", namespace = "http://www.topografix.com/GPX/1/1")
-    protected String type; // Optional
+    protected String type;
 
 }

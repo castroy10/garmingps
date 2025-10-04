@@ -3,6 +3,7 @@ package ru.castroy10.garmingps.model;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,5 +23,11 @@ public class TrackPoint {
 
     @XmlAttribute(name = "lon", required = true)
     protected String lon;
+
+    @XmlElement(name = "ele")
+    protected String ele;
+
+    @XmlElement(name = "time")
+    protected String time;
 
 }

@@ -6,7 +6,7 @@ import jakarta.xml.bind.Marshaller;
 import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +31,7 @@ public class GpsCreatorService {
         final MetaData metadata = new MetaData(
                 "Тестовый маршрут",
                 "Тестовый маршрут",
-                LocalDateTime.now().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT))
+                LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS).format(DateTimeFormatter.ISO_DATE_TIME) + "Z"
         );
 
         final List<WayPoint> waypoints = new ArrayList<>();
@@ -51,7 +51,7 @@ public class GpsCreatorService {
         final List<RoutePoint> routePoints = new ArrayList<>();
         for (int i = 0; i < coordinates.size(); i++) {
             final Coordinate coord = coordinates.get(i);
-            final String name = Integer.toString(i + 1);
+            final String name = (i == coordinates.size() - 1) ? "Finish" : Integer.toString(i + 1);
             final String sym = symbols[i % symbols.length];
             final String type = (i == coordinates.size() - 1) ? "Finish" : null;
             routePoints.add(new RoutePoint(coord.lat(), coord.lon(), name, sym, type));
@@ -61,8 +61,8 @@ public class GpsCreatorService {
         final List<TrackPoint> trackPoints = new ArrayList<>();
         LocalDateTime time = LocalDateTime.now();
         for (final Coordinate coord : coordinates) {
-            trackPoints.add(new TrackPoint(coord.lat(), coord.lon()));
-            time = time.plusMinutes(5);
+            time = time.plusMinutes(5).truncatedTo(ChronoUnit.SECONDS);
+            trackPoints.add(new TrackPoint(coord.lat(), coord.lon(), "0", time.format(DateTimeFormatter.ISO_DATE_TIME) + "Z"));
         }
         final TrackSegment trackSegment = new TrackSegment(trackPoints);
         final Track track = new Track("Трек маршрута", trackSegment);

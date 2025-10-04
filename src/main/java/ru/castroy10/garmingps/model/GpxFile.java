@@ -5,7 +5,6 @@ import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
-import jakarta.xml.bind.annotation.XmlSchemaType;
 import jakarta.xml.bind.annotation.XmlType;
 import java.util.List;
 import lombok.Getter;
@@ -25,18 +24,6 @@ public class GpxFile {
 
     @XmlAttribute(name = "creator", required = true)
     protected String creator = "GPX Route Generator";
-
-    @XmlAttribute(name = "xmlns", required = true)
-    @XmlSchemaType(name = "anyURI")
-    protected String xmlns = "http://www.topografix.com/GPX/1/1";
-
-    @XmlAttribute(name = "xmlns:xsi")
-    @XmlSchemaType(name = "anyURI")
-    protected String xmlnsXsi = "http://www.w3.org/2001/XMLSchema-instance";
-
-    @XmlAttribute(name = "xsi:schemaLocation")
-    @XmlSchemaType(name = "anyURI")
-    protected String schemaLocation = "http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd";
 
     @XmlElement(name = "metadata", namespace = "http://www.topografix.com/GPX/1/1")
     protected MetaData metadata;
