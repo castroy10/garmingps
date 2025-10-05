@@ -56,7 +56,7 @@ public class GpsCreatorService {
             final String type = (i == coordinates.size() - 1) ? "Finish" : null;
             routePoints.add(new RoutePoint(coord.lat(), coord.lon(), name, sym, type));
         }
-        final Route route = new Route("Основной маршрут", "Основной маршрут", routePoints);
+        final Route route = new Route("Route маршрута", "Route маршрута", routePoints);
 
         final List<TrackPoint> trackPoints = new ArrayList<>();
         LocalDateTime time = LocalDateTime.now();
