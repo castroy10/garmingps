@@ -38,11 +38,11 @@
         rowDiv.innerHTML = `
             <div class="col-md-5">
                 <label for="lat${rowIndex}" class="form-label">Широта ${rowIndex}</label>
-                <input type="text" class="form-control" id="lat${rowIndex}" name="lat${rowIndex}" placeholder="Широта ${rowIndex}" value="${latValue}" title="в формате 60.148500">
+                <input type="text" class="form-control" id="lat${rowIndex}" name="lat${rowIndex}" placeholder="Широта ${rowIndex}" value="${latValue}" title="в формате:N 60°08.910′">
             </div>
             <div class="col-md-5">
                 <label for="lon${rowIndex}" class="form-label">Долгота ${rowIndex}</label>
-                <input type="text" class="form-control" id="lon${rowIndex}" name="lon${rowIndex}" placeholder="Долгота ${rowIndex}" value="${lonValue}" title="в формате 30.586183">
+                <input type="text" class="form-control" id="lon${rowIndex}" name="lon${rowIndex}" placeholder="Долгота ${rowIndex}" value="${lonValue}" title="в формате:E 030°35.171′">
             </div>
             <div class="col-md-2 d-flex align-items-end">
                 <button type="button" class="btn btn-primary w-100" onclick="addCoordinate(${rowIndex})">Добавить</button>
@@ -116,7 +116,7 @@
                         // Выводим HTML ошибки в консоль для отладки
                         console.error("Ответ сервера с ошибкой (HTML):", text);
                         // Выбрасываем новую ошибку с информацией о статусе
-                        throw new Error(`Сервер вернул ошибку: ${response.status} ${response.statusText}`);
+                        throw new Error(`${response.status} ${text}`);
                     });
                 }
                 // Если запрос успешен, ожидаем бинарные данные (blob)
@@ -151,7 +151,7 @@
                 // Обработка любых ошибок (сетевых, JSON.parse, логики внутри .then и т.д.)
                 console.error('Ошибка при отправке или обработке ответа:', error);
                 // Отображаем сообщение об ошибке пользователю
-                document.getElementById('output').innerHTML = '<div class="alert alert-danger">Ошибка: ' + error.message + '</div>';
+                document.getElementById('output').innerHTML = '<div class="alert alert-danger">Сервер вернул ошибку: <br>' + error.message + '</div>';
             });
     }
 

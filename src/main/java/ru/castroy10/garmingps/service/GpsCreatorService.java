@@ -10,7 +10,10 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import ru.castroy10.garmingps.model.Coordinate;
 import ru.castroy10.garmingps.model.Extensions;
 import ru.castroy10.garmingps.model.GpxFile;
@@ -26,7 +29,27 @@ import ru.castroy10.garmingps.model.WayPoint;
 @Slf4j
 public class GpsCreatorService {
 
-    public byte[] getGpsTrack(final List<Coordinate> coordinates) {
+    public ResponseEntity<byte[]> createGpxTrack(final List<Coordinate> coordinates) {
+        try {
+            return ResponseEntity.ok()
+                                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"track.gpx\"")
+                                 .header(HttpHeaders.CONTENT_TYPE, "application/octet-stream")
+                                 .body(getGpsTrack(coordinates));
+        } catch (final Exception e) {
+            log.error("Ошибка: ", e);
+            return ResponseEntity.internalServerError()
+                                 .body(printStackTrace(e).getBytes());
+        }
+    }
+
+    private byte[] getGpsTrack(final List<Coordinate> rawCoordinates) {
+        if (CollectionUtils.isEmpty(rawCoordinates)){
+            throw new IllegalArgumentException("Должна быть минимум одна пара координат");
+        }
+
+        final List<Coordinate> coordinates = rawCoordinates.stream()
+                                                .map(this::parseCoordinate)
+                                                .toList();
 
         final MetaData metadata = new MetaData(
                 "Тестовый маршрут",
@@ -85,6 +108,70 @@ public class GpsCreatorService {
         } catch (final JAXBException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private String printStackTrace(final Throwable e) {
+        final StringBuilder sb = new StringBuilder();
+
+        sb.append(e.toString()).append(System.lineSeparator());
+        for (final StackTraceElement element : e.getStackTrace()) {
+            sb.append(element.toString())
+              .append(System.lineSeparator());
+        }
+
+        Throwable cause = e.getCause();
+        while (cause != null) {
+            sb.append("Caused by: ")
+              .append(cause)
+              .append(System.lineSeparator());
+            for (final StackTraceElement element : cause.getStackTrace()) {
+                sb.append(element.toString())
+                  .append(System.lineSeparator());
+            }
+            cause = cause.getCause();
+        }
+
+        return sb.toString();
+    }
+
+    private Coordinate parseCoordinate(final Coordinate coordinate) {
+        final String latInput = coordinate.lat().trim();
+        final double latitude = parseCoordinatePart(latInput);
+
+        final String lonInput = coordinate.lon().trim();
+        final double longitude = parseCoordinatePart(lonInput);
+
+        return new Coordinate(
+                String.format("%.6f", latitude).replace(',', '.'),
+                String.format("%.6f", longitude).replace(',', '.')
+        );
+    }
+
+    private double parseCoordinatePart(final String input) {
+        final String[] parts = input.trim().split("\\s+");
+        if (parts.length != 2) {
+            throw new IllegalArgumentException("Неверный формат координаты: " + input);
+        }
+        final String hemisphereStr = parts[0];
+        final String dmsStr = parts[1];
+        return getResult(hemisphereStr, dmsStr);
+    }
+
+    private double getResult(final String hemisphereStr, final String dmsStr) {
+        final char hemisphere = hemisphereStr.charAt(0);
+
+        final String[] dmsParts = dmsStr.split("[°′]");
+        if (dmsParts.length < 2) {
+            throw new IllegalArgumentException("Неверный формат DMS: " + dmsStr);
+        }
+        final double degrees = Double.parseDouble(dmsParts[0]);
+        final double minutes = Double.parseDouble(dmsParts[1]);
+        double result = degrees + minutes / 60.0;
+
+        if (hemisphere == 'S' || hemisphere == 'W') {
+            result = -result;
+        }
+        return result;
     }
 
 }
