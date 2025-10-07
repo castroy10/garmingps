@@ -25,7 +25,6 @@ import ru.castroy10.garmingps.model.Track;
 import ru.castroy10.garmingps.model.TrackPoint;
 import ru.castroy10.garmingps.model.TrackSegment;
 import ru.castroy10.garmingps.model.WayPoint;
-import ru.castroy10.garmingps.util.StackTrace;
 
 @Service
 @Slf4j
@@ -35,39 +34,24 @@ public class GpsCreatorService {
     private final ParseCoordinateService parseCoordinateService;
 
     public ResponseEntity<byte[]> createGpxTrack(final List<Coordinate> coordinates) {
-        try {
-            return ResponseEntity.ok()
-                                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"track.gpx\"")
-                                 .header(HttpHeaders.CONTENT_TYPE, "application/octet-stream")
-                                 .body(getGpsTrack(coordinates));
-        } catch (final Exception e) {
-            log.error("Ошибка: {}", e.toString());
-            return ResponseEntity.internalServerError()
-                                 .body(StackTrace.printStackTrace(e).getBytes());
-        }
+        return ResponseEntity.ok()
+                             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"track.gpx\"")
+                             .header(HttpHeaders.CONTENT_TYPE, "application/octet-stream")
+                             .body(getGpsTrack(coordinates));
     }
 
     public ResponseEntity<byte[]> createGpxTrackFromText(final List<String> text) {
-        final List<Coordinate> coordinateList;
-        try {
-            coordinateList = parseCoordinateService.parseCoordinateFromText(text);
-        } catch (final Exception e) {
-            log.error("Ошибка: {}", e.toString());
-            return ResponseEntity.internalServerError()
-                                 .body(StackTrace.printStackTrace(e).getBytes());
-        }
+        final List<Coordinate> coordinateList = parseCoordinateService.parseCoordinateFromText(text);
         return createGpxTrack(coordinateList);
     }
 
     private byte[] getGpsTrack(final List<Coordinate> rawCoordinates) {
-        if (CollectionUtils.isEmpty(rawCoordinates)){
+        if (CollectionUtils.isEmpty(rawCoordinates)) {
             throw new IllegalArgumentException("Должна быть минимум одна пара координат");
         }
-
         final List<Coordinate> coordinates = rawCoordinates.stream()
-                                                .map(parseCoordinateService::parseCoordinate)
-                                                .toList();
-
+                                                           .map(parseCoordinateService::parseCoordinate)
+                                                           .toList();
         final MetaData metadata = new MetaData(
                 "Тестовый маршрут",
                 "Тестовый маршрут",
@@ -81,7 +65,8 @@ public class GpsCreatorService {
         for (int i = 0; i < coordinates.size() - 1; i++) {
             final Coordinate coord = coordinates.get(i);
             final Extensions ext = new Extensions(colors[(int) (Math.random() * colors.length)]);
-            waypoints.add(new WayPoint(coord.lat(), coord.lon(), Integer.toString(i + 1), symbols[(int) (Math.random() * symbols.length)], i == 0 ? "Start" : "Waypoint", ext));
+            waypoints.add(new WayPoint(coord.lat(), coord.lon(), Integer.toString(i + 1), symbols[(int) (Math.random() * symbols.length)],
+                                       i == 0 ? "Start" : "Waypoint", ext));
         }
 
         final Coordinate lastCoord = coordinates.getLast();
@@ -106,7 +91,6 @@ public class GpsCreatorService {
         }
         final TrackSegment trackSegment = new TrackSegment(trackPoints);
         final Track track = new Track("Трек маршрута", trackSegment);
-
         final GpxFile gpxFile = new GpxFile(metadata, waypoints, route, track);
 
         return getFile(gpxFile);
@@ -121,8 +105,10 @@ public class GpsCreatorService {
             final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             marshaller.marshal(gpxFile, byteArrayOutputStream);
             log.info("Подробный GPX файл успешно создан");
+
             return byteArrayOutputStream.toByteArray();
         } catch (final JAXBException e) {
+            log.error("Ошибка маршализации GPX файла");
             throw new RuntimeException(e);
         }
     }
