@@ -19,8 +19,19 @@
         <div id="coordinatesContainer"></div>
         <button type="button" class="btn btn-success mt-3" onclick="submitCoordinates()">Отправить</button>
     </form>
-
     <div id="output" class="mt-3"></div>
+</div>
+
+<div class="container mt-4">
+    <h2>Создание GPS Трека по массиву координат</h2>
+    <form id="textForm" accept-charset="UTF-8">
+        <div class="mb-3">
+            <label for="textInput" class="form-label">Введите координаты (каждая строка - пара координат):</label>
+            <textarea class="form-control" id="textInput" rows="10" placeholder="01 N 60°08.910′ E 030°34.915′&#10;02 N 60°08.846′ E 030°35.171′"></textarea>
+        </div>
+        <button type="button" class="btn btn-success mt-3" onclick="submitText()">Отправить</button>
+    </form>
+    <div id="result" class="mt-3"></div>
 </div>
 
 <script>
@@ -38,11 +49,11 @@
         rowDiv.innerHTML = `
             <div class="col-md-5">
                 <label for="lat${rowIndex}" class="form-label">Широта ${rowIndex}</label>
-                <input type="text" class="form-control" id="lat${rowIndex}" name="lat${rowIndex}" placeholder="Широта ${rowIndex}" value="${latValue}" title="в формате:N 60°08.910′">
+                <input type="text" class="form-control" id="lat${rowIndex}" name="lat${rowIndex}" placeholder="N 60°08.910′" value="${latValue}" title="в формате:N 60°08.910′">
             </div>
             <div class="col-md-5">
                 <label for="lon${rowIndex}" class="form-label">Долгота ${rowIndex}</label>
-                <input type="text" class="form-control" id="lon${rowIndex}" name="lon${rowIndex}" placeholder="Долгота ${rowIndex}" value="${lonValue}" title="в формате:E 030°35.171′">
+                <input type="text" class="form-control" id="lon${rowIndex}" name="lon${rowIndex}" placeholder="E 030°34.915′" value="${lonValue}" title="в формате:E 030°35.171′">
             </div>
             <div class="col-md-2 d-flex align-items-end">
                 <button type="button" class="btn btn-primary w-100" onclick="addCoordinate(${rowIndex})">Добавить</button>
@@ -159,7 +170,55 @@
     document.addEventListener('DOMContentLoaded', function () {
         addRow();
     });
-</script>
+
+    function submitText() {
+        const textArea = document.getElementById('textInput');
+        const text = textArea.value;
+        // Разбиваем текст на строки и фильтруем пустые
+        const lines = text.split('\n')
+            .map(line => line.trim())
+            .filter(line => line.length > 0);
+        // Отправляем на сервер
+        fetch('/text', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(lines)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        console.error("Ответ сервера с ошибкой:", text);
+                        throw new Error(`${response.status} ${text}`);
+                    });
+                }
+                // Ожидаем бинарные данные (blob) для скачивания файла
+                return response.blob();
+            })
+            .then(blob => {
+                // Создаем URL для blob-объекта
+                const downloadUrl = window.URL.createObjectURL(blob);
+                // Создаем временный элемент <a> для скачивания
+                const link = document.createElement('a');
+                link.href = downloadUrl;
+                link.download = 'track_from_text.gpx'; // Имя файла для скачивания
+                // Добавляем ссылку в DOM, симулируем клик и удаляем её
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                // Освобождаем созданный URL
+                window.URL.revokeObjectURL(downloadUrl);
+                console.log('Файл успешно получен и предложен для скачивания.');
+                document.getElementById('result').innerHTML =
+                    '<div class="alert alert-success">Файл успешно создан</div>';
+            })
+            .catch(error => {
+                console.error('Ошибка при отправке или обработке ответа:', error);
+                document.getElementById('result').innerHTML =
+                    '<div class="alert alert-danger">Сервер вернул ошибку: <br>' + error.message + '</div>';
+            });
+    }</script>
 
 </body>
 </html>

@@ -25,4 +25,9 @@ public class MainController {
     public ResponseEntity<byte[]> create(@RequestBody final List<Coordinate> coordinate) {
         return gpsCreatorService.createGpxTrack(coordinate);
     }
+
+    @PostMapping("/text")
+    public ResponseEntity<byte[]> createFromText(@RequestBody final List<String> text) {
+        return gpsCreatorService.createGpxTrackFromText(text);
+    }
 }

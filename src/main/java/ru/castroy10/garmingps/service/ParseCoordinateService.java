@@ -1,5 +1,6 @@
 package ru.castroy10.garmingps.service;
 
+import java.util.List;
 import org.springframework.stereotype.Service;
 import ru.castroy10.garmingps.model.Coordinate;
 
@@ -19,6 +20,20 @@ public class ParseCoordinateService {
         );
     }
 
+    public List<Coordinate> parseCoordinateFromText(final List<String> text) {
+        return text.stream()
+                   .map(string -> {
+                       final String[] stringsArray = string.split(" ");
+                       try {
+                           return new Coordinate(stringsArray[1] + " " + stringsArray[2],
+                                                 stringsArray[3] + " " + stringsArray[4]);
+                       } catch (final ArrayIndexOutOfBoundsException e) {
+                           throw new IllegalArgumentException("Неверный формат координаты: " + string);
+                       }
+                   })
+                   .toList();
+    }
+
     private double parseCoordinatePart(final String input) {
         final String[] parts = input.trim().split("\\s+");
         if (parts.length != 2) {
@@ -34,7 +49,7 @@ public class ParseCoordinateService {
 
         final String[] dmsParts = dmsStr.split("[°′]");
         if (dmsParts.length < 2) {
-            throw new IllegalArgumentException("Неверный формат DMS: " + dmsStr);
+            throw new IllegalArgumentException("Неверный формат части координаты: " + dmsStr);
         }
         final double degrees = Double.parseDouble(dmsParts[0]);
         final double minutes = Double.parseDouble(dmsParts[1]);

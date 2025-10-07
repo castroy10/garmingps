@@ -47,6 +47,18 @@ public class GpsCreatorService {
         }
     }
 
+    public ResponseEntity<byte[]> createGpxTrackFromText(final List<String> text) {
+        final List<Coordinate> coordinateList;
+        try {
+            coordinateList = parseCoordinateService.parseCoordinateFromText(text);
+        } catch (final Exception e) {
+            log.error("Ошибка: {}", e.toString());
+            return ResponseEntity.internalServerError()
+                                 .body(StackTrace.printStackTrace(e).getBytes());
+        }
+        return createGpxTrack(coordinateList);
+    }
+
     private byte[] getGpsTrack(final List<Coordinate> rawCoordinates) {
         if (CollectionUtils.isEmpty(rawCoordinates)){
             throw new IllegalArgumentException("Должна быть минимум одна пара координат");
