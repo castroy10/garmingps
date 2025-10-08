@@ -22,6 +22,7 @@ public class ParseCoordinateService {
 
     public List<Coordinate> parseCoordinateFromText(final List<String> text) {
         return text.stream()
+                   .skip(1)
                    .map(string -> {
                        final String[] stringsArray = string.split(" ");
                        try {

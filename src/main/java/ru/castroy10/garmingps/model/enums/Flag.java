@@ -9,9 +9,15 @@ public enum Flag {
     YELLOW("Flag, Yellow"),
     GREEN("Flag, Green");;
 
-    private final String name;
+    private final String code;
 
-    Flag(final String name) {
-        this.name = name;
+    Flag(final String code) {
+        this.code = code;
     }
+
+    public static String getRandom() {
+        final Flag[] flags = Flag.values();
+        return flags[(int) (Math.random() * flags.length)].getCode();
+    }
+
 }

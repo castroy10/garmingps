@@ -25,6 +25,8 @@ import ru.castroy10.garmingps.model.Track;
 import ru.castroy10.garmingps.model.TrackPoint;
 import ru.castroy10.garmingps.model.TrackSegment;
 import ru.castroy10.garmingps.model.WayPoint;
+import ru.castroy10.garmingps.model.enums.Color;
+import ru.castroy10.garmingps.model.enums.Flag;
 
 @Service
 @Slf4j
@@ -32,6 +34,12 @@ import ru.castroy10.garmingps.model.WayPoint;
 public class GpsCreatorService {
 
     private final ParseCoordinateService parseCoordinateService;
+    private static final String START = "Start";
+    private static final String FINISH = "Finish";
+    private static final String WAYPOINT = "Waypoint";
+    private static final String DIRECTION = "Маршрут";
+    private static final String ROUTE = "Route маршрута";
+    private static final String TRACK = "Трек маршрута";
 
     public ResponseEntity<byte[]> createGpxTrack(final List<Coordinate> coordinates) {
         return ResponseEntity.ok()
@@ -53,35 +61,32 @@ public class GpsCreatorService {
                                                            .map(parseCoordinateService::parseCoordinate)
                                                            .toList();
         final MetaData metadata = new MetaData(
-                "Тестовый маршрут",
-                "Тестовый маршрут",
+                DIRECTION,
+                DIRECTION,
                 LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS).format(DateTimeFormatter.ISO_DATE_TIME) + "Z"
         );
 
         final List<WayPoint> waypoints = new ArrayList<>();
-        final String[] symbols = {"Flag, Blue", "Flag, Green", "Flag, Red", "Flag, Yellow"};
-        final String[] colors = {"FF0000FF", "FF00FF00", "FFFF0000", "FFFFFF00"};
-
         for (int i = 0; i < coordinates.size() - 1; i++) {
             final Coordinate coord = coordinates.get(i);
-            final Extensions ext = new Extensions(colors[(int) (Math.random() * colors.length)]);
-            waypoints.add(new WayPoint(coord.lat(), coord.lon(), Integer.toString(i + 1), symbols[(int) (Math.random() * symbols.length)],
-                                       i == 0 ? "Start" : "Waypoint", ext));
+            final Extensions ext = new Extensions(Color.getRandom());
+            waypoints.add(new WayPoint(coord.lat(), coord.lon(), Integer.toString(i + 1), Flag.getRandom(),
+                                       i == 0 ? START : WAYPOINT, ext));
         }
 
         final Coordinate lastCoord = coordinates.getLast();
-        final Extensions lastExt = new Extensions(colors[0]); // Используем цвет первой точки
-        waypoints.add(new WayPoint(lastCoord.lat(), lastCoord.lon(), "Finish", symbols[0], "Finish", lastExt));
+        final Extensions lastExt = new Extensions(Color.BLUE.getCode());
+        waypoints.add(new WayPoint(lastCoord.lat(), lastCoord.lon(), FINISH, Flag.BLUE.getCode(), FINISH, lastExt));
 
         final List<RoutePoint> routePoints = new ArrayList<>();
         for (int i = 0; i < coordinates.size(); i++) {
             final Coordinate coord = coordinates.get(i);
-            final String name = (i == coordinates.size() - 1) ? "Finish" : Integer.toString(i + 1);
-            final String sym = symbols[i % symbols.length];
-            final String type = (i == coordinates.size() - 1) ? "Finish" : null;
+            final String name = (i == coordinates.size() - 1) ? FINISH : Integer.toString(i + 1);
+            final String sym = Flag.getRandom();
+            final String type = (i == coordinates.size() - 1) ? FINISH : null;
             routePoints.add(new RoutePoint(coord.lat(), coord.lon(), name, sym, type));
         }
-        final Route route = new Route("Route маршрута", "Route маршрута", routePoints);
+        final Route route = new Route(ROUTE, ROUTE, routePoints);
 
         final List<TrackPoint> trackPoints = new ArrayList<>();
         LocalDateTime time = LocalDateTime.now();
@@ -90,7 +95,7 @@ public class GpsCreatorService {
             trackPoints.add(new TrackPoint(coord.lat(), coord.lon(), "0", time.format(DateTimeFormatter.ISO_DATE_TIME) + "Z"));
         }
         final TrackSegment trackSegment = new TrackSegment(trackPoints);
-        final Track track = new Track("Трек маршрута", trackSegment);
+        final Track track = new Track(TRACK, trackSegment);
         final GpxFile gpxFile = new GpxFile(metadata, waypoints, route, track);
 
         return getFile(gpxFile);

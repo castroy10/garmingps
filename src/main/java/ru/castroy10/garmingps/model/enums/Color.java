@@ -14,4 +14,10 @@ public enum Color {
     Color(final String code) {
         this.code = code;
     }
+
+    public static String getRandom() {
+        final Color[] colors = Color.values();
+        return colors[(int) (Math.random() * colors.length)].getCode();
+    }
+
 }
