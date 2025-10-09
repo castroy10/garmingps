@@ -1,5 +1,6 @@
 package ru.castroy10.garmingps.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import ru.castroy10.garmingps.model.Coordinate;
@@ -33,6 +34,18 @@ public class ParseCoordinateService {
                        }
                    })
                    .toList();
+    }
+
+    public List<Coordinate> parseCoordinateFromText(final String text) {
+        final List<String> coordinatesList = new ArrayList<>();
+        final String[] lines = text.split("\\r?\\n");
+        for (final String line : lines) {
+            final String trimmedLine = line.trim();
+            if (!trimmedLine.isEmpty()) {
+                coordinatesList.add(trimmedLine);
+            }
+        }
+        return parseCoordinateFromText(coordinatesList);
     }
 
     private double parseCoordinatePart(final String input) {
