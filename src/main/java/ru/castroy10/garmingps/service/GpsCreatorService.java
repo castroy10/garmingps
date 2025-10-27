@@ -69,20 +69,18 @@ public class GpsCreatorService {
         final List<WayPoint> waypoints = new ArrayList<>();
         for (int i = 0; i < coordinates.size() - 1; i++) {
             final Coordinate coord = coordinates.get(i);
-            final Extensions ext = new Extensions(Color.getRandom());
-            waypoints.add(new WayPoint(coord.lat(), coord.lon(), Integer.toString(i + 1), Flag.getRandom(),
-                                       i == 0 ? START : WAYPOINT, ext));
+            waypoints.add(new WayPoint(coord.lat(), coord.lon(), Integer.toString(i + 1), Flag.GREEN.getCode(),
+                                       i == 0 ? START : WAYPOINT, null));
         }
 
         final Coordinate lastCoord = coordinates.getLast();
-        final Extensions lastExt = new Extensions(Color.BLUE.getCode());
-        waypoints.add(new WayPoint(lastCoord.lat(), lastCoord.lon(), FINISH, Flag.BLUE.getCode(), FINISH, lastExt));
+        waypoints.add(new WayPoint(lastCoord.lat(), lastCoord.lon(), FINISH, Flag.GREEN.getCode(), FINISH, null));
 
         final List<RoutePoint> routePoints = new ArrayList<>();
         for (int i = 0; i < coordinates.size(); i++) {
             final Coordinate coord = coordinates.get(i);
             final String name = (i == coordinates.size() - 1) ? FINISH : Integer.toString(i + 1);
-            final String sym = Flag.getRandom();
+            final String sym = Flag.GREEN.getCode();
             final String type = (i == coordinates.size() - 1) ? FINISH : null;
             routePoints.add(new RoutePoint(coord.lat(), coord.lon(), name, sym, type));
         }
