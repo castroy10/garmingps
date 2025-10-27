@@ -2,8 +2,10 @@ package ru.castroy10.garmingps.controller;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,8 +18,12 @@ public class MainController {
 
     private final GpsCreatorService gpsCreatorService;
 
+    @Value("${spring.application.version}")
+    private String version;
+
     @GetMapping()
-    public String index() {
+    public String index(final Model model) {
+        model.addAttribute("version", version);
         return "index";
     }
 
