@@ -15,7 +15,7 @@ public class ControllerExceptionHandler {
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<?> noResourceFoundException(final NoResourceFoundException exception, final WebRequest request) {
         final String path = request.getDescription(false).substring(4);
-        if (path.equals("/favicon.ico")) {
+        if (path.equals("/favicon.ico") || path.equals("/robots.txt")) {
             return ResponseEntity.notFound().build();
         }
         log.error("Resource not found: ", exception);
