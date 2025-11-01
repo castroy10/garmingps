@@ -16,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import ru.castroy10.garmingps.model.Coordinate;
-import ru.castroy10.garmingps.model.Extensions;
 import ru.castroy10.garmingps.model.GpxFile;
 import ru.castroy10.garmingps.model.MetaData;
 import ru.castroy10.garmingps.model.Route;
@@ -25,7 +24,6 @@ import ru.castroy10.garmingps.model.Track;
 import ru.castroy10.garmingps.model.TrackPoint;
 import ru.castroy10.garmingps.model.TrackSegment;
 import ru.castroy10.garmingps.model.WayPoint;
-import ru.castroy10.garmingps.model.enums.Color;
 import ru.castroy10.garmingps.model.enums.Flag;
 
 @Service
