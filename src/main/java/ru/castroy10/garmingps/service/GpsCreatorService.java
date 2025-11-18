@@ -55,9 +55,16 @@ public class GpsCreatorService {
         if (CollectionUtils.isEmpty(rawCoordinates)) {
             throw new IllegalArgumentException("Должна быть минимум одна пара координат");
         }
-        final List<Coordinate> coordinates = rawCoordinates.stream()
-                                                           .map(parseCoordinateService::parseCoordinate)
-                                                           .toList();
+
+        final List<Coordinate> coordinates;
+        if (!rawCoordinates.getFirst().isDecimal()) {
+            coordinates = rawCoordinates.stream()
+                                        .map(parseCoordinateService::parseCoordinate)
+                                        .toList();
+        } else {
+            coordinates = rawCoordinates;
+        }
+
         final MetaData metadata = new MetaData(
                 DIRECTION,
                 DIRECTION,

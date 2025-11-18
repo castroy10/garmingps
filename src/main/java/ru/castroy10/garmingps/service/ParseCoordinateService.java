@@ -24,15 +24,7 @@ public class ParseCoordinateService {
     public List<Coordinate> parseCoordinateFromText(final List<String> text) {
         return text.stream()
                    .skip(1)
-                   .map(string -> {
-                       final String[] stringsArray = string.split(" ");
-                       try {
-                           return new Coordinate(stringsArray[1] + " " + stringsArray[2],
-                                                 stringsArray[3] + " " + stringsArray[4]);
-                       } catch (final ArrayIndexOutOfBoundsException e) {
-                           throw new IllegalArgumentException("Неверный формат координаты: " + string);
-                       }
-                   })
+                   .map(this::makeCoordinate)
                    .toList();
     }
 
@@ -73,6 +65,18 @@ public class ParseCoordinateService {
             result = -result;
         }
         return result;
+    }
+
+    private Coordinate makeCoordinate(final String string) {
+        final String[] stringsArray = string.split(" ");
+        if (stringsArray.length == 5) {
+            return new Coordinate(stringsArray[1] + " " + stringsArray[2],
+                                  stringsArray[3] + " " + stringsArray[4]);
+        }
+        if (stringsArray.length == 3) {
+            return new Coordinate(stringsArray[1], stringsArray[2], true);
+        }
+        throw new IllegalArgumentException("Неверный формат координаты: " + string);
     }
 
 }
