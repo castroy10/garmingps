@@ -68,7 +68,7 @@ public class ParseCoordinateService {
     }
 
     private Coordinate makeCoordinate(final String string) {
-        final String[] stringsArray = string.split(" ");
+        final String[] stringsArray = string.trim().split("\\s+");
         if (stringsArray.length == 5) {
             return new Coordinate(stringsArray[1] + " " + stringsArray[2],
                                   stringsArray[3] + " " + stringsArray[4]);
